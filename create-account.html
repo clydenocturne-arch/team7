@@ -1,87 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Account - Team 7</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: url('https://cdn.wallpapersafari.com/84/12/PIUEry.jpg') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .container {
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 12px;
-      padding: 30px;
-      width: 360px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .container img {
-      width: 80px;
-      margin-bottom: 10px;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    button {
-      background-color: #2b4e9b;
-      color: white;
-      border: none;
-      padding: 10px;
-      width: 100%;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background-color: #1d3775;
-    }
-
-    a {
-      display: block;
-      margin-top: 15px;
-      color: #2b4e9b;
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Create Account</title>
+    <style>
+        body {
+            background-color: #2e2e2e;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial;
+        }
+        .box {
+            background-color: white;
+            color: black;
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 95%;
+            padding: 10px;
+            background-color: #444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #666; }
+        a { color: #444; text-decoration: none; display: block; margin-top: 10px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <img src="https://images-platform.99static.com/jR-eFGuyiHaaQDPbw0Co4ZjyidA=/0x0:1280x1280/500x500/top/smart/99designs-contests-attachments/74/74394/attachment_74394526" alt="Team 7 Logo">
-    <h2>Create Account</h2>
-    <input type="text" placeholder="Username">
-    <input type="email" placeholder="Email">
-    <input type="password" placeholder="Password">
-    <input type="password" placeholder="Confirm Password">
-    <button>Create Account</button>
-    <a href="index.html">Back to Login</a>
-  </div>
+    <div class="box">
+        <h2>Create Account</h2>
+        {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+        <form method="POST">
+            <input type="text" name="fullname" placeholder="Full Name" required><br>
+            <input type="email" name="email" placeholder="Email" required><br>
+            <input type="text" name="username" placeholder="Username" required><br>
+            <input type="password" name="password" placeholder="Password" required><br>
+            <input type="password" name="confirm" placeholder="Confirm Password" required><br>
+            <button type="submit">Create Account</button>
+        </form>
+        <a href="{{ url_for('login_page') }}">Back to Login</a>
+    </div>
 </body>
 </html>
