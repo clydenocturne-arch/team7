@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Computer Monitoring Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #2e2e2e;
+      color: #fff;
+    }
+
+    header {
+      background-color: #1f1f1f;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    canvas {
+      width: 100%;
+      height: 200px;
+      background-color: #f5f5f5;
+      border-radius: 10px;
+    }
+
+    .logout-btn {
+      background: crimson;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+      font-size: 16px;
+    }
+
+    .logout-btn:hover {
+      background: #b30000;
+    }
+
+    .log-container {
+      background: #fff;
+      color: #000;
+      padding: 15px;
+      margin: 20px;
+      border-radius: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      border-bottom: 1px solid #ccc;
+      padding: 6px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>Computer Monitoring Dashboard</header>
+
+  <div class="container">
+    <div class="card">
+      <h3>CPU Usage</h3>
+      <p id="cpu">0%</p>
+    </div>
+    <div class="card">
+      <h3>RAM Usage</h3>
+      <p id="ram">0%</p>
+    </div>
+    <div class="card">
+      <h3>Disk Usage</h3>
+      <p id="disk">0%</p>
+    </div>
+    <div class="card">
+      <h3>Network Activity</h3>
+      <p id="net">0 bytes</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <canvas id="cpuChart"></canvas>
+    </div>
+    <div class="card">
+      <canvas id="ramChart"></canvas>
+    </div>
+  </div>
+
+  <div class="log-container">
+    <h3>Activity Log</h3>
+    <ul id="activityLog"></ul>
+  </div>
+
+  <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+
+  <script>
+    const cpuChartCtx = document.getElementById('cpuChart').getContext('2d');
+    const ramChartCtx = document.getElementById('ramChart').getContext('2d');
+
+    const maxVisiblePoints = 20; // show last 20 points
+
+    const cpuChart = new Chart(cpuChartCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'CPU %',
+          borderColor: 'red',
+          data: [],
+          tension: 0.3,
+          fill: false
+        }]
+      },
+      options: {
+        animation: {
+          duration: 800,
+          easing: 'linear'
+        },
+        scales: { y: { min: 0, max: 100 } }
+      }
+    });
+
+    const ramChart = new Chart(ramChartCtx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'RAM %',
+          borderColor: 'blue',
+          data: [],
+          tension: 0.3,
+          fill: false
+        }]
+      },
+      options: {
+        animation: {
+          duration: 800,
+          easing: 'linear'
+        },
+        scales: { y: { min: 0, max: 100 } }
+      }
+    });
+
+    function updateSystemData() {
+      fetch('/system_data')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('cpu').textContent = data.cpu + '%';
+          document.getElementById('ram').textContent = data.ram + '%';
+          document.getElementById('disk').textContent = data.disk + '%';
+          document.getElementById('net').textContent = data.net + ' bytes';
+
+          const now = new Date().toLocaleTimeString();
+
+          cpuChart.data.labels.push(now);
+          cpuChart.data.datasets[0].data.push(data.cpu);
+          ramChart.data.labels.push(now);
+          ramChart.data.datasets[0].data.push(data.ram);
+
+          while (cpuChart.data.labels.length > maxVisiblePoints) {
+            cpuChart.data.labels.shift();
+            cpuChart.data.datasets[0].data.shift();
+            ramChart.data.labels.shift();
+            ramChart.data.datasets[0].data.shift();
+          }
+
+          cpuChart.update();
+          ramChart.update();
+        })
+        .catch(err => console.error(err));
+    }
+
+    function updateActivityLog() {
+      fetch('/activity_log')
+        .then(res => res.json())
+        .then(logs => {
+          const logList = document.getElementById('activityLog');
+          logList.innerHTML = '';
+          logs.forEach(log => {
+            const li = document.createElement('li');
+            li.textContent = `[${log[2]}] ${log[0]} ${log[1]}`;
+            logList.appendChild(li);
+          });
+        })
+        .catch(err => console.error(err));
+    }
+
+    // update both charts and activity log every 1000ms
+    setInterval(updateSystemData, 1000);
+    setInterval(updateActivityLog, 1000);
+    updateSystemData();
+    updateActivityLog();
+  </script>
+</body>
+</html>
